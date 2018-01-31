@@ -4,7 +4,7 @@
 #
 
 BASE	= 5000
-AFLAGS	= -Dbase=$$$(BASE)
+AFLAGS	= '-Dbase=$$$(BASE)'
 
 .SUFFIXES:	.asm .prg .lst
 
