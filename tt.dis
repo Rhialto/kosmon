@@ -1,0 +1,613 @@
+              r6510 = $1
+              verck_bas = $A
+              L2A = $2A
+              txttab = $2B
+              fretop = $33
+              memsiz = $37
+              L4C = $4C
+              chrget = $73
+              status = $90
+              verck_os = $93
+              LA3 = $A3
+              riprty = $AB
+              sal = $AC
+              eal = $AE
+              tape1 = $B2
+              fnlen = $B7
+              sa = $B9
+              fnadr = $BB
+              roprty = $BD
+              cas1 = $C0
+              memuss = $C3
+              datax = $D7
+              L1A2 = $1A2
+              irqtmp = $29f
+              irqtmp+1 = $2A0
+              igone = $308
+              iload = $330
+              tbuffr = $33C
+              tbuffr_sal = $33D
+              tbuffr_eal = $33F
+              L341 = $341
+              L2020 = $2020
+              L3532 = $3532
+              L4F4C = $4F4C
+              L5F20 = $5F20
+              LA02D = $A02D
+              newstt = $A7AE
+              LA7E7 = $A7E7
+              stop_bas = $A82C
+              synerr = $AF08
+              viccr1 = $D011
+              cia1icr = $DC0D
+              cia2tbl = $DD06
+              cia2tbh = $DD07
+              cia2icr = $DD0D
+              cia2crb = $DD0F
+              LE17A = $E17A
+              slpara = $E1D4
+              LF5A9 = $F5A9
+              LF5D2 = $F5D2
+              LF68F = $F68F
+              LF750 = $F750
+              LF817 = $F817
+              LF838 = $F838
+              LFC93 = $FC93
+              getin = $FFE4
+              .ORG $9C00
+9C00          L9C00:
+9C02          L9C02 = * + 2
+              ; Instruction parameter accessed.
+9C00 4C 40 9C   JMP L9C40
+9C03 00 00 00   .BYTE $0,$0,$0
+9C06 00 00 00   .BYTE $0,$0,$0
+9C09 00 00 00   .BYTE $0,$0,$0
+9C0C 00 00 00   .BYTE $0,$0,$0
+9C0F 00         .BYTE $0
+9C10          L9C10:
+9C10 A9 00      LDA #$0
+9C12 AA         TAX
+9C13 38         SEC
+9C14 E5 37      SBC memsiz
+9C16 AD 02 9C   LDA L9C02
+9C19 A8         TAY
+9C1A E5 38      SBC memsiz+1
+9C1C B0 08      BCS L9C26
+9C1E          L9C1E:
+9C1E 86 37      STX memsiz
+9C20 84 38      STY memsiz+1
+9C22 86 33      STX fretop
+9C24 84 34      STY fretop+1
+9C26          L9C26:
+9C26 60         RTS
+9C27 00 00 00   .BYTE $0,$0,$0
+9C2A 00 00 00   .BYTE $0,$0,$0
+9C2D 00 00 00   .BYTE $0,$0,$0
+9C30 00 00 00   .BYTE $0,$0,$0
+9C33 00 00 00   .BYTE $0,$0,$0
+9C36 00 00 00   .BYTE $0,$0,$0
+9C39 00 00 00   .BYTE $0,$0,$0
+9C3C 00 00 00   .BYTE $0,$0,$0
+9C3F 00         .BYTE $0
+9C40          L9C40:
+9C40 20 10 9C   JSR L9C10
+9C43 EA         NOP
+9C44 EA         NOP
+9C45 EA         NOP
+9C46 EA         NOP
+9C47 EA         NOP
+9C48 EA         NOP
+9C49 EA         NOP
+9C4A EA         NOP
+9C4B EA         NOP
+9C4C EA         NOP
+9C4D EA         NOP
+9C4E EA         NOP
+9C4F EA         NOP
+9C50 A9 5B      LDA #$5B
+9C52 8D 08 03   STA igone
+9C55 EA         NOP
+9C56 EA         NOP
+9C57 8C 09 03   STY igone+1
+9C5A 60         RTS
+9C5B          L9C5B:
+9C5B 20 73 00   JSR chrget
+9C5E F0 04      BEQ L9C64
+9C60          L9C60:
+9C60 C9 5F      CMP #$5F
+9C62 F0 03      BEQ L9C67
+9C64          L9C64:
+9C64 4C E7 A7   JMP LA7E7
+9C67          L9C67:
+9C67 20 73 00   JSR chrget
+9C6A C9 53      CMP #$53
+9C6C F0 0B      BEQ L9C79
+9C6E          L9C6E:
+9C6E C9 4C      CMP #$4C
+9C70 F0 10      BEQ L9C82
+9C72          L9C72:
+9C72 C9 56      CMP #$56
+9C74 F0 15      BEQ L9C8B
+9C76          L9C76:
+9C76 4C 08 AF   JMP synerr
+9C79          L9C79:
+9C79 20 73 00   JSR chrget
+9C7C 20 F0 9C   JSR L9CF0
+9C7F 4C AE A7   JMP newstt
+9C82          L9C82:
+9C82 20 73 00   JSR chrget
+9C85 20 E0 9D   JSR L9DE0
+9C88 4C AE A7   JMP newstt
+9C8B          L9C8B:
+9C8B 20 73 00   JSR chrget
+9C8E 20 E3 9D   JSR L9DE3
+9C91 4C AE A7   JMP newstt
+9C94 00 00 00   .BYTE $0,$0,$0
+9C97 00 00 00   .BYTE $0,$0,$0
+9C9A 00 00 00   .BYTE $0,$0,$0
+9C9D 00 00 00   .BYTE $0,$0,$0
+9CA0 00 00 00   .BYTE $0,$0,$0
+9CA3 00 00 00   .BYTE $0,$0,$0
+9CA6 00 00 00   .BYTE $0,$0,$0
+9CA9 00 00 00   .BYTE $0,$0,$0
+9CAC 00 00 00   .BYTE $0,$0,$0
+9CAF 00 00 00   .BYTE $0,$0,$0
+9CB2 00 00 00   .BYTE $0,$0,$0
+9CB5 00 00 00   .BYTE $0,$0,$0
+9CB8 00 00 00   .BYTE $0,$0,$0
+9CBB 00 00 00   .BYTE $0,$0,$0
+9CBE 00 00 00   .BYTE $0,$0,$0
+9CC1 00 00 00   .BYTE $0,$0,$0
+9CC4 00 00 00   .BYTE $0,$0,$0
+9CC7 00 00 00   .BYTE $0,$0,$0
+9CCA 00 00 00   .BYTE $0,$0,$0
+9CCD 00 00 00   .BYTE $0,$0,$0
+9CD0 00 00 00   .BYTE $0,$0,$0
+9CD3 00 00 00   .BYTE $0,$0,$0
+9CD6 00 00 00   .BYTE $0,$0,$0
+9CD9 00 00 00   .BYTE $0,$0,$0
+9CDC 00 00 00   .BYTE $0,$0,$0
+9CDF 00 00 00   .BYTE $0,$0,$0
+9CE2 00 00 00   .BYTE $0,$0,$0
+9CE5 00 00 00   .BYTE $0,$0,$0
+9CE8 00 00 00   .BYTE $0,$0,$0
+9CEB 00 00 00   .BYTE $0,$0,$0
+9CEE 00 00      .BYTE $0,$0
+9CF0          L9CF0:
+9CF0 A2 05      LDX #$5
+9CF2 86 AB      STX riprty
+9CF4 20 D4 E1   JSR slpara
+9CF7 A2 04      LDX #$4
+9CF9          L9CF9:
+9CF9 B5 2A      LDA L2A,X
+9CFB 95 AB      STA riprty,X
+9CFD CA         DEX
+9CFE D0 F9      BNE L9CF9
+9D00          L9D00:
+9D00 20 38 F8   JSR LF838
+9D03 20 8F F6   JSR LF68F
+9D06 20 7D 9D   JSR L9D7D
+9D09 20 91 9D   JSR L9D91
+9D0C A5 B9      LDA sa
+9D0E 18         CLC
+9D0F 69 01      ADC #$1
+9D11 CA         DEX
+9D12 20 B1 9D   JSR L9DB1
+9D15 A2 08      LDX #$8
+9D17          L9D17:
+9D17 B9 AC 00   LDA sal,Y
+9D1A 20 B1 9D   JSR L9DB1
+9D1D A2 06      LDX #$6
+9D1F C8         INY
+9D20 C0 05      CPY #$5
+9D22 EA         NOP
+9D23 D0 F2      BNE L9D17
+9D25          L9D25:
+9D25 A0 00      LDY #$0
+9D27 A2 04      LDX #$4
+9D29          L9D29:
+9D29 B1 BB      LDA (fnadr),Y
+9D2B C4 B7      CPY fnlen
+9D2D 90 03      BCC L9D32
+9D2F          L9D2F:
+9D2F A9 20      LDA #$20
+9D31 CA         DEX
+9D32          L9D32:
+9D32 20 B1 9D   JSR L9DB1
+9D35 A2 05      LDX #$5
+9D37 C8         INY
+9D38 C0 BB      CPY #$BB
+9D3A D0 ED      BNE L9D29
+9D3C          L9D3C:
+9D3C A9 02      LDA #$2
+9D3E 85 AB      STA riprty
+9D40 20 91 9D   JSR L9D91
+9D43 98         TYA
+9D44 20 B1 9D   JSR L9DB1
+9D47 84 D7      STY datax
+9D49 A2 07      LDX #$7
+9D4B EA         NOP
+9D4C          L9D4C:
+9D4C B1 AC      LDA (sal),Y
+9D4E 20 B1 9D   JSR L9DB1
+9D51 A2 03      LDX #$3
+9D53 E6 AC      INC sal
+9D55 D0 04      BNE L9D5B
+9D57          L9D57:
+9D57 E6 AD      INC sal+1
+9D59 CA         DEX
+9D5A CA         DEX
+9D5B          L9D5B:
+9D5B A5 AC      LDA sal
+9D5D C5 AE      CMP eal
+9D5F A5 AD      LDA sal+1
+9D61 E5 AF      SBC eal+1
+9D63 90 E7      BCC L9D4C
+9D65          L9D65:
+9D65 EA         NOP
+9D66          L9D66:
+9D66 A5 D7      LDA datax
+9D68 20 B1 9D   JSR L9DB1
+9D6B A2 07      LDX #$7
+9D6D 88         DEY
+9D6E D0 F6      BNE L9D66
+9D70          L9D70:
+9D70 C8         INY
+9D71 84 C0      STY cas1
+9D73 58         CLI
+9D74 18         CLC
+9D75 A9 00      LDA #$0
+9D77 8D A0 02   STA irqtmp+1
+9D7A 4C 93 FC   JMP LFC93
+9D7D          L9D7D:
+9D7D A0 00      LDY #$0
+9D7F 84 C0      STY cas1
+9D81 AD 11 D0   LDA viccr1
+9D84 29 EF      AND #$EF
+9D86 8D 11 D0   STA viccr1
+9D89          L9D89:
+9D89 CA         DEX
+9D8A D0 FD      BNE L9D89
+9D8C          L9D8C:
+9D8C 88         DEY
+9D8D D0 FA      BNE L9D89
+9D8F          L9D8F:
+9D8F 78         SEI
+9D90 60         RTS
+9D91          L9D91:
+9D91 A0 00      LDY #$0
+9D93          L9D93:
+9D93 A9 02      LDA #$2
+9D95 20 B1 9D   JSR L9DB1
+9D98 A2 07      LDX #$7
+9D9A 88         DEY
+9D9B C0 09      CPY #$9
+9D9D D0 F4      BNE L9D93
+9D9F          L9D9F:
+9D9F A2 05      LDX #$5
+9DA1 C6 AB      DEC riprty
+9DA3 D0 EE      BNE L9D93
+9DA5          L9DA5:
+9DA5 98         TYA
+9DA6 20 B1 9D   JSR L9DB1
+9DA9 A2 07      LDX #$7
+9DAB 88         DEY
+9DAC D0 F7      BNE L9DA5
+9DAE          L9DAE:
+9DAE CA         DEX
+9DAF CA         DEX
+9DB0 60         RTS
+9DB1          L9DB1:
+9DB1 85 BD      STA roprty
+9DB3 45 D7      EOR datax
+9DB5 85 D7      STA datax
+9DB7 A9 08      LDA #$8
+9DB9 85 A3      STA LA3
+9DBB          L9DBB:
+9DBB 06 BD      ASL roprty
+9DBD A5 01      LDA r6510
+9DBF 29 F7      AND #$F7
+9DC1 20 D3 9D   JSR L9DD3
+9DC4 A2 11      LDX #$11
+9DC6 EA         NOP
+9DC7 09 08      ORA #$8
+9DC9 20 D3 9D   JSR L9DD3
+9DCC A2 0E      LDX #$E
+9DCE C6 A3      DEC LA3
+9DD0 D0 E9      BNE L9DBB
+9DD2          L9DD2:
+9DD2 60         RTS
+9DD3          L9DD3:
+9DD3 CA         DEX
+9DD4 D0 FD      BNE L9DD3
+9DD6          L9DD6:
+9DD6 90 05      BCC L9DDD
+9DD8          L9DD8:
+9DD8 A2 0B      LDX #$B
+9DDA          L9DDA:
+9DDA CA         DEX
+9DDB D0 FD      BNE L9DDA
+9DDD          L9DDD:
+9DDD 85 01      STA r6510
+9DDF 60         RTS
+9DE0          L9DE0:
+9DE0 A2 00      LDX #$0
+9DE3          L9DE3 = * + 1
+              ; Instruction parameter jumped to.
+9DE2 2C A2 01   BIT L1A2
+9DE5 A4 2B      LDY txttab
+9DE7 A5 2C      LDA txttab+1
+9DE9 86 0A      STX verck_bas
+9DEB 86 93      STX verck_os
+9DED 84 C3      STY memuss
+9DEF 85 C4      STA memuss+1
+9DF1 20 D4 E1   JSR slpara
+9DF4 20 FD 9D   JSR L9DFD
+9DF7 4C 7A E1   JMP LE17A
+9DFA          L9DFA:
+9DFA EA         NOP
+9DFB EA         NOP
+9DFC EA         NOP
+9DFD          L9DFD:
+9DFD 20 61 9E   JSR L9E61
+9E00 A5 AB      LDA riprty
+9E02 C9 02      CMP #$2
+9E04 F0 08      BEQ L9E0E
+9E06          L9E06:
+9E06 C9 01      CMP #$1
+9E08 D0 F3      BNE L9DFD
+9E0A          L9E0A:
+9E0A A5 B9      LDA sa
+9E0C F0 0A      BEQ L9E18
+9E0E          L9E0E:
+9E0E AD 3C 03   LDA tbuffr
+9E11 85 C3      STA memuss
+9E13 AD 3D 03   LDA tbuffr_sal
+9E16 85 C4      STA memuss+1
+9E18          L9E18:
+9E18 20 50 F7   JSR LF750
+9E1B          L9E1B:
+9E1B 20 E4 FF   JSR getin
+9E1E F0 FB      BEQ L9E1B
+9E20          L9E20:
+9E20 20 2C A8   JSR stop_bas
+9E23 A4 B7      LDY fnlen
+9E25 F0 0B      BEQ L9E32
+9E27          L9E27:
+9E27 88         DEY
+9E28 B1 BB      LDA (fnadr),Y
+9E2A D9 41 03   CMP L341,Y
+9E2D D0 CE      BNE L9DFD
+9E2F          L9E2F:
+9E2F 98         TYA
+9E30 D0 F5      BNE L9E27
+9E32          L9E32:
+9E32 84 90      STY status
+9E34 20 D2 F5   JSR LF5D2
+9E37 AD 3E 03   LDA tbuffr_sal+1
+9E3A 38         SEC
+9E3B ED 3C 03   SBC tbuffr
+9E3E 08         PHP
+9E3F 18         CLC
+9E40 65 C3      ADC memuss
+9E42 85 AE      STA eal
+9E44 AD 3F 03   LDA tbuffr_eal
+9E47 65 C4      ADC memuss+1
+9E49 28         PLP
+9E4A ED 3D 03   SBC tbuffr_sal
+9E4D 85 AF      STA eal+1
+9E4F 20 76 9E   JSR L9E76
+9E52 A5 BD      LDA roprty
+9E54 45 D7      EOR datax
+9E56 05 90      ORA status
+9E58 F0 04      BEQ L9E5E
+9E5A          L9E5A:
+9E5A A9 FF      LDA #$FF
+9E5C 85 90      STA status
+9E5E          L9E5E:
+9E5E 4C A9 F5   JMP LF5A9
+9E61          L9E61:
+9E61 20 AF 9E   JSR L9EAF
+9E64 C9 00      CMP #$0
+9E66 F0 F9      BEQ L9E61
+9E68          L9E68:
+9E68 85 AB      STA riprty
+9E6A          L9E6A:
+9E6A 20 DD 9E   JSR L9EDD
+9E6D 91 B2      STA (tape1),Y
+9E6F C8         INY
+9E70 C0 C0      CPY #$C0
+9E72 D0 F6      BNE L9E6A
+9E74          L9E74:
+9E74 F0 2D      BEQ L9EA3
+9E76          L9E76:
+9E76 20 AF 9E   JSR L9EAF
+9E79          L9E79:
+9E79 20 DD 9E   JSR L9EDD
+9E7C C4 93      CPY verck_os
+9E7E D0 02      BNE L9E82
+9E80          L9E80:
+9E80 91 C3      STA (memuss),Y
+9E82          L9E82:
+9E82 D1 C3      CMP (memuss),Y
+9E84 F0 02      BEQ L9E88
+9E86          L9E86:
+9E86 86 90      STX status
+9E88          L9E88:
+9E88 45 D7      EOR datax
+9E8A 85 D7      STA datax
+9E8C E6 C3      INC memuss
+9E8E D0 02      BNE L9E92
+9E90          L9E90:
+9E90 E6 C4      INC memuss+1
+9E92          L9E92:
+9E92 A5 C3      LDA memuss
+9E94 C5 AE      CMP eal
+9E96 A5 C4      LDA memuss+1
+9E98 E5 AF      SBC eal+1
+9E9A 90 DD      BCC L9E79
+9E9C          L9E9C:
+9E9C 20 DD 9E   JSR L9EDD
+9E9F 20 7D 9D   JSR L9D7D
+9EA2 C8         INY
+9EA3          L9EA3:
+9EA3 84 C0      STY cas1
+9EA5 58         CLI
+9EA6 18         CLC
+9EA7 A9 00      LDA #$0
+9EA9 8D A0 02   STA irqtmp+1
+9EAC 4C 93 FC   JMP LFC93
+9EAF          L9EAF:
+9EAF 20 17 F8   JSR LF817
+9EB2 20 7D 9D   JSR L9D7D
+9EB5 84 D7      STY datax
+9EB7 A9 07      LDA #$7
+9EB9 8D 06 DD   STA cia2tbl
+9EBC A2 01      LDX #$1
+9EBE          L9EBE:
+9EBE 20 F0 9E   JSR L9EF0
+9EC1 26 BD      ROL roprty
+9EC3 A5 BD      LDA roprty
+9EC5 C9 02      CMP #$2
+9EC7 D0 F5      BNE L9EBE
+9EC9          L9EC9:
+9EC9 A0 09      LDY #$9
+9ECB          L9ECB:
+9ECB 20 DD 9E   JSR L9EDD
+9ECE C9 02      CMP #$2
+9ED0 F0 F9      BEQ L9ECB
+9ED2          L9ED2:
+9ED2 C4 BD      CPY roprty
+9ED4 D0 E8      BNE L9EBE
+9ED6          L9ED6:
+9ED6 20 DD 9E   JSR L9EDD
+9ED9 88         DEY
+9EDA D0 F6      BNE L9ED2
+9EDC          L9EDC:
+9EDC 60         RTS
+9EDD          L9EDD:
+9EDD A9 08      LDA #$8
+9EDF 85 A3      STA LA3
+9EE1          L9EE1:
+9EE1 20 F0 9E   JSR L9EF0
+9EE4 26 BD      ROL roprty
+9EE6 EA         NOP
+9EE7 EA         NOP
+9EE8 EA         NOP
+9EE9 C6 A3      DEC LA3
+9EEB D0 F4      BNE L9EE1
+9EED          L9EED:
+9EED A5 BD      LDA roprty
+9EEF 60         RTS
+9EF0          L9EF0:
+9EF0 A9 10      LDA #$10
+9EF2          L9EF2:
+9EF2 2C 0D DC   BIT cia1icr
+9EF5 F0 FB      BEQ L9EF2
+9EF7          L9EF7:
+9EF7 AD 0D DD   LDA cia2icr
+9EFA 8E 07 DD   STX cia2tbh
+9EFD 48         PHA
+9EFE A9 19      LDA #$19
+9F00 8D 0F DD   STA cia2crb
+9F03 68         PLA
+9F04 4A         LSR A
+9F05 4A         LSR A
+9F06 60         RTS
+9F07 00         .BYTE $0
+9F08          L9F08:
+9F08 A9 20      LDA #$20
+9F0A AC 02 9C   LDY L9C02
+9F0D C8         INY
+9F0E C8         INY
+9F0F C8         INY
+9F10 8D 30 03   STA iload
+9F13 8C 31 03   STY iload+1
+9F16 60         RTS
+9F17 00 00 00   .BYTE $0,$0,$0
+9F1A 00 00 00   .BYTE $0,$0,$0
+9F1D 00 00 00   .BYTE $0,$0,$0
+9F20          L9F20:
+9F20 85 93      STA verck_os
+9F22 20 FD 9D   JSR L9DFD
+9F25 A9 00      LDA #$0
+9F27 85 90      STA status
+9F29 A5 BD      LDA roprty
+9F2B 45 D7      EOR datax
+9F2D F0 02      BEQ L9F31
+9F2F          L9F2F:
+9F2F C6 90      DEC status
+9F31          L9F31:
+9F31 60         RTS
+9F32          L9F32:
+9F32 20 20 5F   JSR L5F20
+9F35 41 4C      EOR (L4C,X)
+9F37 4C 4C 4F   JMP L4F4C
+9F3A 41 44 20   .BYTE $41,$44,$20
+9F3D 56 49 41   .BYTE $56,$49,$41
+9F40 54 55 52   .BYTE $54,$55,$52
+9F43 42 4F 21   .BYTE $42,$4F,$21
+9F46 21 21 00   .BYTE $21,$21,$0
+9F49 00 00 00   .BYTE $0,$0,$0
+9F4C 00 00 00   .BYTE $0,$0,$0
+9F4F 00 00 00   .BYTE $0,$0,$0
+9F52 00 00 00   .BYTE $0,$0,$0
+9F55 00 00 00   .BYTE $0,$0,$0
+9F58 00 00 00   .BYTE $0,$0,$0
+9F5B 00 00 00   .BYTE $0,$0,$0
+9F5E 00 00 00   .BYTE $0,$0,$0
+9F61 00 00 00   .BYTE $0,$0,$0
+9F64 00 00 00   .BYTE $0,$0,$0
+9F67 00 00 00   .BYTE $0,$0,$0
+9F6A 00 00 00   .BYTE $0,$0,$0
+9F6D 00 00 00   .BYTE $0,$0,$0
+9F70 00 00 00   .BYTE $0,$0,$0
+9F73 00 00 00   .BYTE $0,$0,$0
+9F76 00 00 00   .BYTE $0,$0,$0
+9F79 00 00 00   .BYTE $0,$0,$0
+9F7C 00 00 00   .BYTE $0,$0,$0
+9F7F 00 00 00   .BYTE $0,$0,$0
+9F82 00 00 00   .BYTE $0,$0,$0
+9F85 00 00 00   .BYTE $0,$0,$0
+9F88 00 00 00   .BYTE $0,$0,$0
+9F8B 00 00 00   .BYTE $0,$0,$0
+9F8E 00 00 00   .BYTE $0,$0,$0
+9F91 00 00 00   .BYTE $0,$0,$0
+9F94 00 00 00   .BYTE $0,$0,$0
+9F97 00 00 00   .BYTE $0,$0,$0
+9F9A 00 00 00   .BYTE $0,$0,$0
+9F9D 00 00 00   .BYTE $0,$0,$0
+9FA0 00 00 00   .BYTE $0,$0,$0
+9FA3 00 00 00   .BYTE $0,$0,$0
+9FA6 00 00 00   .BYTE $0,$0,$0
+9FA9 00 00 00   .BYTE $0,$0,$0
+9FAC 00 00 00   .BYTE $0,$0,$0
+9FAF 00 00 00   .BYTE $0,$0,$0
+9FB2 00 00 00   .BYTE $0,$0,$0
+9FB5 00 00 00   .BYTE $0,$0,$0
+9FB8 00 00 00   .BYTE $0,$0,$0
+9FBB 00 00 00   .BYTE $0,$0,$0
+9FBE 00 00 00   .BYTE $0,$0,$0
+9FC1 00 00 00   .BYTE $0,$0,$0
+9FC4 00 00 00   .BYTE $0,$0,$0
+9FC7 00 00 00   .BYTE $0,$0,$0
+9FCA 00 00 00   .BYTE $0,$0,$0
+9FCD 00 00 00   .BYTE $0,$0,$0
+9FD0 00 00 00   .BYTE $0,$0,$0
+9FD3 00 00 00   .BYTE $0,$0,$0
+9FD6 00 00 00   .BYTE $0,$0,$0
+9FD9 00 00 00   .BYTE $0,$0,$0
+9FDC 00 00 00   .BYTE $0,$0,$0
+9FDF 00 00 00   .BYTE $0,$0,$0
+9FE2 00 00 00   .BYTE $0,$0,$0
+9FE5 00 00 00   .BYTE $0,$0,$0
+9FE8 00 00 20   .BYTE $0,$0,$20
+9FEB 20         .BYTE $20
+9FEC          L9FEC:
+9FEC 20 20 20   JSR L2020
+9FEF 20 32 35   JSR L3532
+9FF2 30 39      BMI LA02D
+9FF4 31 39 38   .BYTE $31,$39,$38
+9FF7 34 00 00   .BYTE $34,$0,$0
+9FFA 00 00 00   .BYTE $0,$0,$0
+9FFD 00 00 00   .BYTE $0,$0,$0

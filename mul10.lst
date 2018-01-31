@@ -1,0 +1,28 @@
+ASxxxx Assembler V01.50  (Rockwell 65C02), page 1.
+
+
+
+                              1 ;;;;
+                              2 ;
+                              3 ; .A *= 10 (%1010)
+                              4 ;
+   0000 85 09                 5 mul10:	sta tmp
+   0002 0A                    6 	asl a
+   0003 0A                    7 	asl a
+   0004 18                    8 	clc
+   0005 65 09                 9 	adc tmp
+   0007 0A                   10 	asl a
+   0008 60                   11 	rts
+                             12 
+o  0009                      13 tmp:	dc.b
+                             14 ;;;;
+ASxxxx Assembler V01.50  (Rockwell 65C02), page 2.
+
+Symbol Table
+
+  0 mul10              0000 R   |   0 tmp                0009 R
+ASxxxx Assembler V01.50  (Rockwell 65C02), page 3.
+
+Area Table
+
+   0 _CODE              size    9   flags 0

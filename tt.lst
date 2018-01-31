@@ -1,0 +1,523 @@
+------- FILE tt.asm
+    1  9f46                             processor     6502
+    2  ????                                       
+    3  ????                  pet            =     1
+    4  ????                  c64            =     2
+    5  ????                                       
+    6  ????                  target         =     c64
+    7  ????                                       
+    8  ????                                if     target == c64
+    9  ????                                       
+   10  ????                  r6510          =     $1
+   11  ????                  verck_bas      =     $A
+   12  ????                  txttab         =     $2B
+   13  ????                  fretop         =     $33
+   14  ????                  memsiz         =     $37
+   15  ????                  chrget         =     $73
+   16  ????                  status         =     $90
+   17  ????                  verck_os       =     $93
+   18  ????                  mybitcount     =     $A3
+   19  ????                  riprty         =     $AB
+   20  ????                  sal            =     $AC
+   21  ????                  eal            =     $AE
+   22  ????                  tape1          =     $B2
+   23  ????                  fnlen          =     $B7
+   24  ????                  sa             =     $B9
+   25  ????                  fnadr          =     $BB
+   26  ????                  roprty         =     $BD
+   27  ????                  cas1           =     $C0
+   28  ????                  memuss         =     $C3
+   29  ????                  datax          =     $D7
+   30  ????                  irqtmp         =     $29f
+   31  ????                  igone          =     $308
+   32  ????                  iload          =     $330
+   33  ????                  tbuffr         =     $33C
+   34  ????                  newstt         =     $A7AE
+   35  ????                  igone_org      =     $A7E7
+   36  ????                  stop_bas       =     $A82C
+   37  ????                  synerr         =     $AF08
+   38  ????                  viccr1         =     $D011
+   39  ????                  cia1icr        =     $DC0D
+   40  ????                  cia2tbl        =     $DD06
+   41  ????                  cia2tbh        =     $DD07
+   42  ????                  cia2icr        =     $DD0D
+   43  ????                  cia2crb        =     $DD0F
+   44  ????                  maybeloaderrror     =     $E17A
+   45  ????                  slpara         =     $E1D4
+   46  ????                  ealtoxy        =     $F5A9
+   47  ????                  printloading     =     $F5D2
+   48  ????                  prsaving       =     $F68F
+   49  ????                  printfound     =     $F750
+   50  ????                  pressplayontape     =     $F817
+   51  ????                  waitrecordplay     =     $F838
+   52  ????                                       
+   53  ????                  motoroff       =     $FC93
+   54  ????                                       
+   55  ????                             endif     
+   56  ????                                       
+   57  ????                  getin          =     $FFE4
+   58  ????                                       
+   59  ????                  mystart        =     $9c00
+   60  ????                  mychecksum     =     datax
+   61  ????                  myleaderlen     =     riprty
+   62  ????                  mytapebyte     =     roprty
+   63  ????                                       
+   64  9c00                               ORG     mystart
+   65  9c00                                       
+   66  9c00                  L9C00                
+   67  9c00                  L9C02          =     . + 2
+   68  9c00                                       
+   69  9c00      4c 40 9c                 JMP     init
+   70  9c03                                       
+   71  9c03                                if     target == c64
+   72  9c10                               org     mystart + $10
+   73  9c10                             endif     
+   74  9c10                                       
+   75  9c10                                       
+   76  9c10                                       
+   77  9c10                  adjust_fretop           
+   78  9c10      a9 00                    LDA     #<mystart
+   79  9c12      aa                       TAX     
+   80  9c13      38                       SEC     
+   81  9c14      e5 37                    SBC     memsiz
+   82  9c16      ad 02 9c                 LDA     L9C02
+   83  9c19      a8                       TAY     
+   84  9c1a      e5 38                    SBC     memsiz+1
+   85  9c1c      b0 08                    BCS     L9C26
+   86  9c1e                  L9C1E                
+   87  9c1e      86 37                    STX     memsiz
+   88  9c20      84 38                    STY     memsiz+1
+   89  9c22      86 33                    STX     fretop
+   90  9c24      84 34                    STY     fretop+1
+   91  9c26                  L9C26                
+   92  9c26      60                       RTS     
+   93  9c27                                       
+   94  9c27                                if     target == c64
+   95  9c27                                       
+   96  9c27                                       
+   97  9c40                               org     mystart + $40
+   98  9c40                                       
+   99  9c40                             endif     
+  100  9c40                                       
+  101  9c40                  init                 
+  102  9c40      20 10 9c                 JSR     adjust_fretop
+  103  9c43      a9 4c                    LDA     #<wedge
+  104  9c45      8d 08 03                 STA     igone
+  105  9c48      8c 09 03                 STY     igone+1
+  106  9c4b      60                       RTS     
+  107  9c4c                                       
+  108  9c4c                  wedge                
+  109  9c4c      20 73 00                 JSR     chrget
+  110  9c4f      f0 04                    BEQ     L9C64
+  111  9c51                  L9C60                
+  112  9c51      c9 5f                    CMP     #$5F
+  113  9c53      f0 03                    BEQ     L9C67
+  114  9c55                  L9C64                
+  115  9c55      4c e7 a7                 JMP     igone_org
+  116  9c58                  L9C67                
+  117  9c58      20 73 00                 JSR     chrget
+  118  9c5b      c9 53                    CMP     #"S"
+  119  9c5d      f0 0b                    BEQ     arrows
+  120  9c5f                  L9C6E                
+  121  9c5f      c9 4c                    CMP     #"L"
+  122  9c61      f0 10                    BEQ     arrowl
+  123  9c63                  L9C72                
+  124  9c63      c9 56                    CMP     #"V"
+  125  9c65      f0 15                    BEQ     arrowv
+  126  9c67                  L9C76                
+  127  9c67      4c 08 af                 JMP     synerr
+  128  9c6a                                       
+  129  9c6a                  arrows               
+  130  9c6a      20 73 00                 JSR     chrget
+  131  9c6d      20 85 9c                 JSR     dosave
+  132  9c70      4c ae a7                 JMP     newstt
+  133  9c73                  arrowl               
+  134  9c73      20 73 00                 JSR     chrget
+  135  9c76      20 75 9d                 JSR     doload
+  136  9c79      4c ae a7                 JMP     newstt
+  137  9c7c                  arrowv               
+  138  9c7c      20 73 00                 JSR     chrget
+  139  9c7f      20 78 9d                 JSR     dovrfy
+  140  9c82      4c ae a7                 JMP     newstt
+  141  9c85                                       
+  142  9c85                  dosave               
+  143  9c85      a2 05                    LDX     #$5
+  144  9c87      86 ab                    STX     myleaderlen
+  145  9c89      20 d4 e1                 JSR     slpara
+  146  9c8c      a2 04                    LDX     #$4
+  147  9c8e                  L9CF9                
+  148  9c8e      b5 2a                    LDA     txttab-1,X
+  149  9c90      95 ab                    STA     sal-1,X
+  150  9c92      ca                       DEX     
+  151  9c93      d0 f9                    BNE     L9CF9
+  152  9c95                                       
+  153  9c95      20 38 f8                 JSR     waitrecordplay
+  154  9c98      20 8f f6                 JSR     prsaving
+  155  9c9b      20 12 9d                 JSR     motoron
+  156  9c9e      20 26 9d                 JSR     writeleader
+  157  9ca1      a5 b9                    LDA     sa
+  158  9ca3      18                       CLC     
+  159  9ca4      69 01                    ADC     #$1
+  160  9ca6      ca                       DEX     
+  161  9ca7      20 46 9d                 JSR     writebyte
+  162  9caa      a2 08                    LDX     #$8
+  163  9cac                  L9D17                
+  164  9cac      b9 ac 00                 LDA     sal,Y
+  165  9caf      20 46 9d                 JSR     writebyte
+  166  9cb2      a2 06                    LDX     #$6
+  167  9cb4      c8                       INY     
+  168  9cb5      c0 05                    CPY     #$5
+  169  9cb7      ea                       NOP     
+  170  9cb8      d0 f2                    BNE     L9D17
+  171  9cba                                       
+  172  9cba      a0 00                    LDY     #$0
+  173  9cbc      a2 04                    LDX     #$4
+  174  9cbe                  L9D29                
+  175  9cbe      b1 bb                    LDA     (fnadr),Y
+  176  9cc0      c4 b7                    CPY     fnlen
+  177  9cc2      90 03                    BCC     L9D32
+  178  9cc4                                       
+  179  9cc4      a9 20                    LDA     #$20
+  180  9cc6      ca                       DEX     
+  181  9cc7                  L9D32                
+  182  9cc7      20 46 9d                 JSR     writebyte
+  183  9cca      a2 05                    LDX     #$5
+  184  9ccc      c8                       INY     
+  185  9ccd      c0 bb                    CPY     #$BB
+  186  9ccf      d0 ed                    BNE     L9D29
+  187  9cd1                                       
+  188  9cd1                                       
+  189  9cd1                  L9D3C                
+  190  9cd1      a9 02                    LDA     #$2
+  191  9cd3      85 ab                    STA     myleaderlen
+  192  9cd5      20 26 9d                 JSR     writeleader
+  193  9cd8      98                       TYA     
+  194  9cd9      20 46 9d                 JSR     writebyte
+  195  9cdc      84 d7                    STY     mychecksum
+  196  9cde      a2 07                    LDX     #$7
+  197  9ce0      ea                       NOP     
+  198  9ce1                                       
+  199  9ce1                  L9D4C                
+  200  9ce1      b1 ac                    LDA     (sal),Y
+  201  9ce3      20 46 9d                 JSR     writebyte
+  202  9ce6      a2 03                    LDX     #$3
+  203  9ce8      e6 ac                    INC     sal
+  204  9cea      d0 04                    BNE     L9D5B
+  205  9cec                                       
+  206  9cec      e6 ad                    INC     sal+1
+  207  9cee      ca                       DEX     
+  208  9cef      ca                       DEX     
+  209  9cf0                  L9D5B                
+  210  9cf0      a5 ac                    LDA     sal
+  211  9cf2      c5 ae                    CMP     eal
+  212  9cf4      a5 ad                    LDA     sal+1
+  213  9cf6      e5 af                    SBC     eal+1
+  214  9cf8      90 e7                    BCC     L9D4C
+  215  9cfa                                       
+  216  9cfa      ea                       NOP     
+  217  9cfb                  L9D66                
+  218  9cfb      a5 d7                    LDA     mychecksum
+  219  9cfd      20 46 9d                 JSR     writebyte
+  220  9d00      a2 07                    LDX     #$7
+  221  9d02      88                       DEY     
+  222  9d03      d0 f6                    BNE     L9D66
+  223  9d05                                       
+  224  9d05      c8                       INY     
+  225  9d06      84 c0                    STY     cas1
+  226  9d08      58                       CLI     
+  227  9d09      18                       CLC     
+  228  9d0a      a9 00                    LDA     #$0
+  229  9d0c      8d a0 02                 STA     irqtmp+1
+  230  9d0f      4c 93 fc                 JMP     motoroff
+  231  9d12                                       
+  232  9d12                  motoron              
+  233  9d12      a0 00                    LDY     #$0
+  234  9d14      84 c0                    STY     cas1
+  235  9d16                                       
+  236  9d16      ad 11 d0                 LDA     viccr1
+  237  9d19      29 ef                    AND     #$EF
+  238  9d1b      8d 11 d0                 STA     viccr1
+  239  9d1e                                       
+  240  9d1e                  L9D89                
+  241  9d1e      ca                       DEX     
+  242  9d1f      d0 fd                    BNE     L9D89
+  243  9d21      88                       DEY     
+  244  9d22      d0 fa                    BNE     L9D89
+  245  9d24      78                       SEI     
+  246  9d25      60                       RTS     
+  247  9d26                                       
+  248  9d26                  writeleader           
+  249  9d26      a0 00                    LDY     #$0
+  250  9d28                  L9D93                
+  251  9d28      a9 02                    LDA     #$2
+  252  9d2a      20 46 9d                 JSR     writebyte
+  253  9d2d      a2 07                    LDX     #$7
+  254  9d2f      88                       DEY     
+  255  9d30      c0 09                    CPY     #$9
+  256  9d32      d0 f4                    BNE     L9D93
+  257  9d34                                       
+  258  9d34      a2 05                    LDX     #$5
+  259  9d36      c6 ab                    DEC     myleaderlen
+  260  9d38      d0 ee                    BNE     L9D93
+  261  9d3a                  L9DA5                
+  262  9d3a      98                       TYA     
+  263  9d3b      20 46 9d                 JSR     writebyte
+  264  9d3e      a2 07                    LDX     #$7
+  265  9d40      88                       DEY     
+  266  9d41      d0 f7                    BNE     L9DA5
+  267  9d43      ca                       DEX     
+  268  9d44      ca                       DEX     
+  269  9d45      60                       RTS     
+  270  9d46                                       
+  271  9d46                  writebyte            
+  272  9d46      85 bd                    STA     mytapebyte
+  273  9d48      45 d7                    EOR     mychecksum
+  274  9d4a      85 d7                    STA     mychecksum
+  275  9d4c      a9 08                    LDA     #$8
+  276  9d4e      85 a3                    STA     mybitcount
+  277  9d50                  L9DBB                
+  278  9d50      06 bd                    ASL     mytapebyte
+  279  9d52      a5 01                    LDA     r6510
+  280  9d54      29 f7                    AND     #$F7
+  281  9d56      20 68 9d                 JSR     writebit
+  282  9d59      a2 11                    LDX     #$11
+  283  9d5b      ea                       NOP     
+  284  9d5c      09 08                    ORA     #$8
+  285  9d5e      20 68 9d                 JSR     writebit
+  286  9d61      a2 0e                    LDX     #$E
+  287  9d63      c6 a3                    DEC     mybitcount
+  288  9d65      d0 e9                    BNE     L9DBB
+  289  9d67                                       
+  290  9d67      60                       RTS     
+  291  9d68                                       
+  292  9d68                  writebit             
+  293  9d68      ca                       DEX     
+  294  9d69      d0 fd                    BNE     writebit
+  295  9d6b      90 05                    BCC     L9DDD
+  296  9d6d      a2 0b                    LDX     #$B
+  297  9d6f                  L9DDA                
+  298  9d6f      ca                       DEX     
+  299  9d70      d0 fd                    BNE     L9DDA
+  300  9d72                  L9DDD                
+  301  9d72      85 01                    STA     r6510
+  302  9d74      60                       RTS     
+  303  9d75                                       
+  304  9d75                  doload               
+  305  9d75      a2 00                    LDX     #$0
+  306  9d77      2c                        dc.b   $2c
+  307  9d78                  dovrfy               
+  308  9d78      a2 01                    LDX     #$1
+  309  9d7a                                       
+  310  9d7a      a4 2b                    LDY     txttab
+  311  9d7c      a5 2c                    LDA     txttab+1
+  312  9d7e      86 0a                    STX     verck_bas
+  313  9d80      86 93                    STX     verck_os
+  314  9d82      84 c3                    STY     memuss
+  315  9d84      85 c4                    STA     memuss+1
+  316  9d86      20 d4 e1                 JSR     slpara
+  317  9d89      20 8f 9d                 JSR     loadprg
+  318  9d8c      4c 7a e1                 JMP     maybeloaderrror
+  319  9d8f                                       
+  320  9d8f                  loadprg              
+  321  9d8f      20 ee 9d                 JSR     readheader
+  322  9d92      a5 ab                    LDA     myleaderlen
+  323  9d94      c9 02                    CMP     #$2
+  324  9d96      f0 08                    BEQ     L9E0E
+  325  9d98                                       
+  326  9d98      c9 01                    CMP     #$1
+  327  9d9a      d0 f3                    BNE     loadprg
+  328  9d9c      a5 b9                    LDA     sa
+  329  9d9e      f0 0a                    BEQ     L9E18
+  330  9da0                  L9E0E                
+  331  9da0      ad 3c 03                 LDA     tbuffr
+  332  9da3      85 c3                    STA     memuss
+  333  9da5      ad 3d 03                 LDA     tbuffr+1
+  334  9da8      85 c4                    STA     memuss+1
+  335  9daa                  L9E18                
+  336  9daa      20 50 f7                 JSR     printfound
+  337  9dad                                       
+  338  9dad                                       
+  339  9dad                                       
+  340  9dad                                       
+  341  9dad                                       
+  342  9dad      20 2c a8                 JSR     stop_bas
+  343  9db0      a4 b7                    LDY     fnlen
+  344  9db2      f0 0b                    BEQ     L9E32
+  345  9db4                  L9E27                
+  346  9db4      88                       DEY     
+  347  9db5      b1 bb                    LDA     (fnadr),Y
+  348  9db7      d9 41 03                 CMP     tbuffr+5,Y
+  349  9dba      d0 d3                    BNE     loadprg
+  350  9dbc      98                       TYA     
+  351  9dbd      d0 f5                    BNE     L9E27
+  352  9dbf                                       
+  353  9dbf                  L9E32                
+  354  9dbf      84 90                    STY     status
+  355  9dc1      20 d2 f5                 JSR     printloading
+  356  9dc4      ad 3e 03                 LDA     tbuffr+1+1
+  357  9dc7      38                       SEC     
+  358  9dc8      ed 3c 03                 SBC     tbuffr
+  359  9dcb      08                       PHP     
+  360  9dcc      18                       CLC     
+  361  9dcd      65 c3                    ADC     memuss
+  362  9dcf      85 ae                    STA     eal
+  363  9dd1      ad 3f 03                 LDA     tbuffr+3
+  364  9dd4      65 c4                    ADC     memuss+1
+  365  9dd6      28                       PLP     
+  366  9dd7      ed 3d 03                 SBC     tbuffr+1
+  367  9dda      85 af                    STA     eal+1
+  368  9ddc      20 03 9e                 JSR     loadmem
+  369  9ddf      a5 bd                    LDA     mytapebyte
+  370  9de1      45 d7                    EOR     mychecksum
+  371  9de3      05 90                    ORA     status
+  372  9de5      f0 04                    BEQ     L9E5E
+  373  9de7                                       
+  374  9de7      a9 ff                    LDA     #$FF
+  375  9de9      85 90                    STA     status
+  376  9deb                  L9E5E                
+  377  9deb      4c a9 f5                 JMP     ealtoxy
+  378  9dee                                       
+  379  9dee                  readheader           
+  380  9dee      20 3c 9e                 JSR     findleader
+  381  9df1      c9 00                    CMP     #$0
+  382  9df3      f0 f9                    BEQ     readheader
+  383  9df5                                       
+  384  9df5      85 ab                    STA     myleaderlen
+  385  9df7                  L9E6A                
+  386  9df7      20 6a 9e                 JSR     readbyte
+  387  9dfa      91 b2                    STA     (tape1),Y
+  388  9dfc      c8                       INY     
+  389  9dfd      c0 c0                    CPY     #$C0
+  390  9dff      d0 f6                    BNE     L9E6A
+  391  9e01                                       
+  392  9e01      f0 2d                    BEQ     stoptape
+  393  9e03                                       
+  394  9e03                  loadmem              
+  395  9e03      20 3c 9e                 JSR     findleader
+  396  9e06                  L9E79                
+  397  9e06      20 6a 9e                 JSR     readbyte
+  398  9e09      c4 93                    CPY     verck_os
+  399  9e0b      d0 02                    BNE     L9E82
+  400  9e0d      91 c3                    STA     (memuss),Y
+  401  9e0f                  L9E82                
+  402  9e0f      d1 c3                    CMP     (memuss),Y
+  403  9e11      f0 02                    BEQ     L9E88
+  404  9e13      86 90                    STX     status
+  405  9e15                  L9E88                
+  406  9e15      45 d7                    EOR     mychecksum
+  407  9e17      85 d7                    STA     mychecksum
+  408  9e19                                       
+  409  9e19      e6 c3                    INC     memuss
+  410  9e1b      d0 02                    BNE     L9E92
+  411  9e1d      e6 c4                    INC     memuss+1
+  412  9e1f                  L9E92                
+  413  9e1f      a5 c3                    LDA     memuss
+  414  9e21      c5 ae                    CMP     eal
+  415  9e23      a5 c4                    LDA     memuss+1
+  416  9e25      e5 af                    SBC     eal+1
+  417  9e27      90 dd                    BCC     L9E79
+  418  9e29                                       
+  419  9e29      20 6a 9e                 JSR     readbyte
+  420  9e2c      20 12 9d                 JSR     motoron
+  421  9e2f      c8                       INY     
+  422  9e30                                       
+  423  9e30                  stoptape             
+  424  9e30      84 c0                    STY     cas1
+  425  9e32      58                       CLI     
+  426  9e33      18                       CLC     
+  427  9e34      a9 00                    LDA     #$0
+  428  9e36      8d a0 02                 STA     irqtmp+1
+  429  9e39      4c 93 fc                 JMP     motoroff
+  430  9e3c                                       
+  431  9e3c                  findleader           
+  432  9e3c      20 17 f8                 JSR     pressplayontape
+  433  9e3f      20 12 9d                 JSR     motoron
+  434  9e42      84 d7                    STY     mychecksum
+  435  9e44      a9 07                    LDA     #$7
+  436  9e46      8d 06 dd                 STA     cia2tbl
+  437  9e49      a2 01                    LDX     #$1
+  438  9e4b                  L9EBE                
+  439  9e4b      20 7d 9e                 JSR     readbit
+  440  9e4e      26 bd                    ROL     mytapebyte
+  441  9e50      a5 bd                    LDA     mytapebyte
+  442  9e52      c9 02                    CMP     #$2
+  443  9e54      d0 f5                    BNE     L9EBE
+  444  9e56                                       
+  445  9e56      a0 09                    LDY     #$9
+  446  9e58                  L9ECB                
+  447  9e58      20 6a 9e                 JSR     readbyte
+  448  9e5b      c9 02                    CMP     #$2
+  449  9e5d      f0 f9                    BEQ     L9ECB
+  450  9e5f                  L9ED2                
+  451  9e5f      c4 bd                    CPY     mytapebyte
+  452  9e61      d0 e8                    BNE     L9EBE
+  453  9e63      20 6a 9e                 JSR     readbyte
+  454  9e66      88                       DEY     
+  455  9e67      d0 f6                    BNE     L9ED2
+  456  9e69                  L9EDC                
+  457  9e69      60                       RTS     
+  458  9e6a                                       
+  459  9e6a                  readbyte             
+  460  9e6a      a9 08                    LDA     #$8
+  461  9e6c      85 a3                    STA     mybitcount
+  462  9e6e                  L9EE1                
+  463  9e6e      20 7d 9e                 JSR     readbit
+  464  9e71      26 bd                    ROL     mytapebyte
+  465  9e73      ea                       NOP     
+  466  9e74      ea                       NOP     
+  467  9e75      ea                       NOP     
+  468  9e76      c6 a3                    DEC     mybitcount
+  469  9e78      d0 f4                    BNE     L9EE1
+  470  9e7a                                       
+  471  9e7a      a5 bd                    LDA     mytapebyte
+  472  9e7c      60                       RTS     
+  473  9e7d                                       
+  474  9e7d                  readbit              
+  475  9e7d      a9 10                    LDA     #$10
+  476  9e7f                  L9EF2                
+  477  9e7f      2c 0d dc                 BIT     cia1icr
+  478  9e82      f0 fb                    BEQ     L9EF2
+  479  9e84                                       
+  480  9e84      ad 0d dd                 LDA     cia2icr
+  481  9e87      8e 07 dd                 STX     cia2tbh
+  482  9e8a      48                       PHA     
+  483  9e8b      a9 19                    LDA     #$19
+  484  9e8d      8d 0f dd                 STA     cia2crb
+  485  9e90      68                       PLA     
+  486  9e91      4a                       LSR     
+  487  9e92      4a                       LSR     
+  488  9e93      60                       RTS     
+  489  9e94                                       
+  490  9e94                                if     target == c64
+  491  9f08                               org     mystart + $0308
+  492  9f08                                       
+  493  9f08                                       
+  494  9f08                  patchiload           
+  495  9f08      a9 17                    LDA     #<niload
+  496  9f0a      ac 02 9c                 LDY     L9C02
+  497  9f0d      c8                       INY     
+  498  9f0e      c8                       INY     
+  499  9f0f      c8                       INY     
+  500  9f10      8d 30 03                 STA     iload
+  501  9f13      8c 31 03                 STY     iload+1
+  502  9f16      60                       RTS     
+  503  9f17                                       
+  504  9f17                  niload               
+  505  9f17      85 93                    STA     verck_os
+  506  9f19      20 8f 9d                 JSR     loadprg
+  507  9f1c      a9 00                    LDA     #$0
+  508  9f1e      85 90                    STA     status
+  509  9f20      a5 bd                    LDA     mytapebyte
+  510  9f22      45 d7                    EOR     mychecksum
+  511  9f24      f0 02                    BEQ     L9F31
+  512  9f26                  L9F2F                
+  513  9f26      c6 90                    DEC     status
+  514  9f28                  L9F31                
+  515  9f28      60                       RTS     
+  516  9f29                  L9F32                
+  517  9f29      5f 41 4c 4c               dc.b   "_ALLOAD VIATURBO!!!",0
+  518  9f3d                                       
+  519  9f3d                             endif     
+  520  9f3d                                       
+  521  9f3d      32 35 30 39               dc.b   "25091984",0
+  522  9f46      31 39 30 31               dc.b   "19011995",0
